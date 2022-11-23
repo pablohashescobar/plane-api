@@ -1,11 +1,12 @@
 """Production settings and globals."""
+from plane.settings.local import WEB_URL
 from .common import *  # noqa
+
 import dj_database_url
+from urllib.parse import urlparse
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
-
-from urllib.parse import urlparse
 
 # Database
 DEBUG = False
@@ -19,19 +20,16 @@ DATABASES = {
     }
 }
 
+# CORS WHITELIST ON PROD
+CORS_ORIGIN_WHITELIST = [
+    # "https://example.com",
+    # "https://sub.example.com",
+    # "http://localhost:8080",
+    # "http://127.0.0.1:9000"
+]
 # Parse database configuration from $DATABASE_URL
 DATABASES["default"] = dj_database_url.config()
 SITE_ID = 1
-
-sentry_sdk.init(
-    dsn=os.environ.get("SENTRY_DSN"),
-    integrations=[DjangoIntegration(), RedisIntegration()],
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True,
-    environment="staging",
-    traces_sample_rate=1,
-)
 
 # Enable Connection Pooling (if desired)
 # DATABASES['default']['ENGINE'] = 'django_postgrespool'
@@ -42,12 +40,22 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Allow all host headers
 ALLOWED_HOSTS = ["*"]
 
-# CORS allow all on staging
-CORS_ORIGIN_ALLOW_ALL = True
+# TODO: Make it FALSE and LIST DOMAINS IN FULL PROD.
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Simplified static file serving.
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
-INSTALLED_APPS.append("django_s3_storage")
-
+sentry_sdk.init(
+    dsn=os.environ.get("SENTRY_DSN"),
+    integrations=[DjangoIntegration(), RedisIntegration()],
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    traces_sample_rate=1,
+    send_default_pii=True,
+    environment="staging",
+)
 
 # The AWS region to connect to.
 AWS_REGION = os.environ.get("AWS_REGION")
@@ -144,6 +152,7 @@ ALLOWED_HOSTS = [
     "*",
 ]
 
+
 DEFAULT_FILE_STORAGE = "django_s3_storage.storage.S3Storage"
 # Simplified static file serving.
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
@@ -152,7 +161,12 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 
-REDIS_URL = urlparse(os.environ.get("REDIS_URL"))
+REDIS_URL = os.environ.get("REDIS_URL")
+
+REDIS_TLS_URL = os.environ.get("REDIS_TLS_URL")
+
+if REDIS_TLS_URL:
+    REDIS_URL = REDIS_TLS_URL
 
 CACHES = {
     "default": {
