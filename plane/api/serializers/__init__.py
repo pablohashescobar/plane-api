@@ -37,4 +37,6 @@ from .issue import (
     IssueSerializer,
     IssueFlatSerializer,
     IssueStateSerializer,
+    LabelGroupCreateSerializer,
+    LabelGroupSerializer,
 )

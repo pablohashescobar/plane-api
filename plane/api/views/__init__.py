@@ -46,6 +46,7 @@ from .issue import (
     TimeLineIssueViewSet,
     IssuePropertyViewSet,
     LabelViewSet,
+    LabelGroupViewSet,
 )
 
 from .auth_extended import (

@@ -52,6 +52,7 @@ from plane.api.views import (
     LabelViewSet,
     AddMemberToProjectEndpoint,
     ProjectJoinEndpoint,
+    LabelGroupViewSet,
 )
 
 from plane.api.views.project import AddTeamToProjectEndpoint
@@ -477,6 +478,26 @@ urlpatterns = [
             }
         ),
         name="project-issue-labels",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/issue-label-groups/",
+        LabelGroupViewSet.as_view(
+            {
+                "get": "list",
+                "post": "create",
+            }
+        ),
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/issue-label-groups/<uuid:pk>/",
+        LabelGroupViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
     ),
     ## End Issues
     ## Issue Activity

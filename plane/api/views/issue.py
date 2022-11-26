@@ -21,6 +21,8 @@ from plane.api.serializers import (
     LabelSerializer,
     IssueSerializer,
     LabelSerializer,
+    LabelGroupSerializer,
+    LabelGroupCreateSerializer,
 )
 from plane.api.permissions import (
     ProjectEntityPermission,
@@ -36,6 +38,7 @@ from plane.db.models import (
     IssueProperty,
     Label,
     IssueBlocker,
+    LabelGroup,
 )
 
 
@@ -355,3 +358,48 @@ class LabelViewSet(BaseViewSet):
             .select_related("workspace")
             .distinct()
         )
+
+
+class LabelGroupViewSet(BaseViewSet):
+
+    serializer_class = LabelGroupSerializer
+    model = LabelGroup
+    permission_classes = [
+        ProjectMemberPermission,
+    ]
+
+    def get_serializer_class(self):
+        return (
+            LabelGroupCreateSerializer
+            if self.action in ["create", "update", "partial_update"]
+            else LabelGroupSerializer
+        )
+
+    def get_queryset(self):
+        return self.filter_queryset(
+            super()
+            .get_queryset()
+            .filter(workspace__slug=self.kwargs.get("slug"))
+            .filter(project_id=self.kwargs.get("project_id"))
+            .filter(project__project_projectmember__member=self.request.user)
+            .select_related("project")
+            .select_related("workspace")
+            .distinct()
+        )
+
+    def create(self, request, slug, project_id):
+        try:
+            project = Project.objects.get(workspace__slug=slug, pk=project_id)
+            serializer = LabelGroupCreateSerializer(
+                data=request.data, context={"project": project}
+            )
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Project.DoesNotExist:
+            return Response(
+                {"error": "Project was not found"}, status=status.HTTP_404_NOT_FOUND
+            )

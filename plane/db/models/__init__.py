@@ -23,6 +23,8 @@ from .issue import (
     IssueAssignee,
     Label,
     IssueBlocker,
+    LabelGroup,
+    IssueLabelGroup,
 )
 
 from .asset import FileAsset
