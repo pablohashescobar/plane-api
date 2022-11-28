@@ -52,6 +52,7 @@ from plane.api.views import (
     LabelViewSet,
     AddMemberToProjectEndpoint,
     ProjectJoinEndpoint,
+    BulkDeleteIssuesEndpoint,
 )
 
 from plane.api.views.project import AddTeamToProjectEndpoint
@@ -477,6 +478,10 @@ urlpatterns = [
             }
         ),
         name="project-issue-labels",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/bulk-delete-issues/",
+        BulkDeleteIssuesEndpoint.as_view(),
     ),
     ## End Issues
     ## Issue Activity
