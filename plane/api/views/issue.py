@@ -37,6 +37,7 @@ from plane.db.models import (
     Label,
     IssueBlocker,
 )
+from plane.utils.grouper import group_results
 
 
 class IssueViewSet(BaseViewSet):
@@ -112,14 +113,8 @@ class IssueViewSet(BaseViewSet):
             # TODO: Move this group by from ittertools to ORM for better performance - nk
             if group_by:
                 issue_dict = dict()
-
                 issues = IssueSerializer(issue_queryset, many=True).data
-
-                for key, value in groupby(
-                    issues, lambda issue: self.grouper(issue, group_by)
-                ):
-                    issue_dict[str(key)] = list(value)
-
+                issue_dict = group_results(issues, group_by)
                 return Response(issue_dict, status=status.HTTP_200_OK)
 
             return self.paginate(
