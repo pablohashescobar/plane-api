@@ -53,6 +53,7 @@ from plane.api.views import (
     AddMemberToProjectEndpoint,
     ProjectJoinEndpoint,
     BulkDeleteIssuesEndpoint,
+    BulkAssignIssuesToCycleEndpoint,
 )
 
 from plane.api.views.project import AddTeamToProjectEndpoint
@@ -427,6 +428,11 @@ urlpatterns = [
             }
         ),
         name="project-cycle",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/cycles/<uuid:cycle_id>/bulk-assign-issues/",
+        BulkAssignIssuesToCycleEndpoint.as_view(),
+        name="bulk-assign-cycle-issues",
     ),
     ## End Cycles
     # Issue
