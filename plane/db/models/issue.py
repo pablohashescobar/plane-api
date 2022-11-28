@@ -233,6 +233,7 @@ class Label(ProjectBaseModel):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    colour = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name = "Label"
