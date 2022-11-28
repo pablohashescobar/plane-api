@@ -355,3 +355,39 @@ class LabelViewSet(BaseViewSet):
             .select_related("workspace")
             .distinct()
         )
+
+
+class BulkDeleteIssuesEndpoint(BaseAPIView):
+
+    permission_classes = [
+        ProjectEntityPermission,
+    ]
+
+    def delete(self, request, slug, project_id):
+        try:
+
+            issue_ids = request.data.get("issue_ids", [])
+
+            if not len(issue_ids):
+                return Response(
+                    {"error": "Issue IDs are required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            issues = Issue.objects.filter(
+                workspace__slug=slug, project_id=project_id, pk__in=issue_ids
+            )
+
+            total_issues = len(issues)
+
+            issues.delete()
+
+            return Response(
+                {"message": f"{total_issues} issues were deleted"}, status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            capture_exception(e)
+            return Response(
+                {"error": "Something went wrong please try again later"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
