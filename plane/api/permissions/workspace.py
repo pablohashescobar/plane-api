@@ -9,6 +9,9 @@ from plane.db.models import WorkspaceMember, ProjectMember
 class WorkSpaceBasePermission(BasePermission):
     def has_permission(self, request, view):
         # allow anyone to create a workspace
+        if request.user.is_anonymous:
+            return False
+
         if request.method == "POST":
             return True
 
@@ -31,6 +34,10 @@ class WorkSpaceBasePermission(BasePermission):
 
 class WorkSpaceAdminPermission(BasePermission):
     def has_permission(self, request, view):
+
+        if request.user.is_anonymous:
+            return False
+
         return WorkspaceMember.objects.filter(
             member=request.user, workspace=view.workspace, role__in=[15, 20]
         ).exists()
