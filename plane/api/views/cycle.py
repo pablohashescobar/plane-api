@@ -1,8 +1,12 @@
+# Third party imports
+from rest_framework.response import Response
+from rest_framework import status
+
 # Module imports
-from . import BaseViewSet
+from . import BaseViewSet, BaseAPIView
 from plane.api.serializers import CycleSerializer, CycleIssueSerializer
 from plane.api.permissions import ProjectEntityPermission
-from plane.db.models import Cycle, CycleIssue
+from plane.db.models import Cycle, CycleIssue, Issue
 
 
 class CycleViewSet(BaseViewSet):
@@ -61,3 +65,45 @@ class CycleIssueViewSet(BaseViewSet):
             .select_related("issue__state")
             .distinct()
         )
+
+
+class BulkAssignIssuesToCycleEndpoint(BaseAPIView):
+
+    permission_classes = [
+        ProjectEntityPermission,
+    ]
+
+    def post(self, request, slug, project_id, cycle_id):
+        try:
+
+            issue_ids = request.data.get("issue_ids")
+
+            cycle = Cycle.objects.get(
+                workspace__slug=slug, project_id=project_id, pk=cycle_id
+            )
+
+            issues = Issue.objects.filter(
+                pk__in=issue_ids, workspace__slug=slug, project_id=project_id
+            )
+
+            CycleIssue.objects.bulk_create(
+                [
+                    CycleIssue(
+                        project_id=project_id,
+                        workspace=cycle.workspace,
+                        created_by=request.user,
+                        updated_by=request.user,
+                        cycle=cycle,
+                        issue=issue,
+                    )
+                    for issue in issues
+                ],
+                batch_size=10,
+                ignore_conflicts=True,
+            )
+            return Response({"message": "Success"}, status=status.HTTP_200_OK)
+
+        except Cycle.DoesNotExist:
+            return Response(
+                {"error": "Cycle not found"}, status=status.HTTP_404_NOT_FOUND
+            )
