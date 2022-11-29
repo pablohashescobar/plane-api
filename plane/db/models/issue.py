@@ -231,6 +231,13 @@ class IssueProperty(ProjectBaseModel):
 
 class Label(ProjectBaseModel):
 
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="parent_label",
+    )
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
