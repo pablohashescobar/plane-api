@@ -19,8 +19,6 @@ from plane.db.models import (
     IssueLabel,
     Label,
     IssueBlocker,
-    IssueLabelGroup,
-    LabelGroup,
 )
 
 
@@ -315,90 +313,6 @@ class IssueSerializer(BaseSerializer):
 
     class Meta:
         model = Issue
-        fields = "__all__"
-        read_only_fields = [
-            "workspace",
-            "project",
-            "created_by",
-            "updated_by",
-            "created_at",
-            "updated_at",
-        ]
-
-
-class LabelGroupCreateSerializer(BaseSerializer):
-
-    labels_list = serializers.ListField(
-        child=serializers.PrimaryKeyRelatedField(queryset=Label.objects.all()),
-        write_only=True,
-        required=False,
-    )
-
-    class Meta:
-        model = LabelGroup
-        fields = "__all__"
-        read_only_fields = [
-            "workspace",
-            "project",
-            "created_by",
-            "updated_by",
-            "created_at",
-            "updated_at",
-        ]
-
-    def create(self, validated_data):
-
-        labels = validated_data.pop("labels_list", None)
-        project = self.context["project"]
-        label_group = LabelGroup.objects.create(**validated_data, project=project)
-
-        if labels is not None:
-            IssueLabelGroup.objects.bulk_create(
-                [
-                    IssueLabelGroup(
-                        label=label,
-                        label_group=label_group,
-                        project=project,
-                        workspace=project.workspace,
-                        created_by=label_group.created_by,
-                        updated_by=label_group.updated_by,
-                    )
-                    for label in labels
-                ],
-                batch_size=10,
-            )
-
-            return label_group
-
-    def update(self, instance, validated_data):
-        labels = validated_data.pop("labels_list", None)
-
-        if labels is not None:
-            IssueLabelGroup.objects.filter(label_group=instance).delete()
-            IssueLabelGroup.objects.bulk_create(
-                [
-                    IssueLabelGroup(
-                        label=label,
-                        label_group=instance,
-                        project=instance.project,
-                        workspace=instance.project.workspace,
-                        created_by=instance.created_by,
-                        updated_by=instance.updated_by,
-                    )
-                    for label in labels
-                ],
-                batch_size=10,
-            )
-
-        return super().update(instance, validated_data)
-
-
-class LabelGroupSerializer(BaseSerializer):
-
-    label_details = LabelSerializer(read_only=True, source="labels", many=True)
-
-    class Meta:
-        model = LabelGroup
         fields = "__all__"
         read_only_fields = [
             "workspace",

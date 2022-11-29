@@ -231,6 +231,13 @@ class IssueProperty(ProjectBaseModel):
 
 class Label(ProjectBaseModel):
 
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="parent_label",
+    )
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
@@ -275,33 +282,6 @@ class IssueSequence(ProjectBaseModel):
         verbose_name = "Issue Sequence"
         verbose_name_plural = "Issue Sequences"
         db_table = "issue_sequence"
-        ordering = ("-created_at",)
-
-
-class LabelGroup(ProjectBaseModel):
-
-    name = models.CharField(max_length=255)
-    labels = models.ManyToManyField(
-        "db.Label", blank=True, related_name="label_groups", through="IssueLabelGroup"
-    )
-
-    class Meta:
-        verbose_name = "Label Group"
-        verbose_name_plural = "Label Groups"
-        db_table = "label_group"
-        ordering = ("-created_at",)
-        unique_together = ["name", "project"]
-
-
-class IssueLabelGroup(ProjectBaseModel):
-
-    label_group = models.ForeignKey("db.LabelGroup", on_delete=models.CASCADE, related_name="label_group")
-    label = models.ForeignKey("db.Label", on_delete=models.CASCADE, related_name="group")
-
-    class Meta:
-        verbose_name = "Issue Label Group"
-        verbose_name_plural = "Issue Label Groups"
-        db_table = "issue_label_group"
         ordering = ("-created_at",)
 
 
