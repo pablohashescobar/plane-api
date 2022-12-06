@@ -36,6 +36,7 @@ from plane.db.models import (
     IssueProperty,
     Label,
     IssueBlocker,
+    CycleIssue,
 )
 
 
@@ -89,6 +90,12 @@ class IssueViewSet(BaseViewSet):
                     queryset=IssueBlocker.objects.select_related("block", "blocked_by"),
                 )
             )
+            .prefetch_related(
+                Prefetch(
+                    "issue_cycle",
+                    queryset=CycleIssue.objects.select_related("cycle", "issue"),
+                ),
+            )
         )
 
     def grouper(self, issue, group_by):
@@ -129,6 +136,7 @@ class IssueViewSet(BaseViewSet):
             )
 
         except Exception as e:
+            print(e)
             capture_exception(e)
             return Response(
                 {"error": "Something went wrong please try again later"},
@@ -384,7 +392,8 @@ class BulkDeleteIssuesEndpoint(BaseAPIView):
             issues.delete()
 
             return Response(
-                {"message": f"{total_issues} issues were deleted"}, status=status.HTTP_200_OK
+                {"message": f"{total_issues} issues were deleted"},
+                status=status.HTTP_200_OK,
             )
         except Exception as e:
             capture_exception(e)
