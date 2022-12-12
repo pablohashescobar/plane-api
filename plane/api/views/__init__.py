@@ -40,7 +40,6 @@ from .cycle import CycleViewSet, CycleIssueViewSet, BulkAssignIssuesToCycleEndpo
 from .asset import FileAssetEndpoint
 from .issue import (
     IssueViewSet,
-    UserIssuesEndpoint,
     WorkSpaceIssuesEndpoint,
     IssueActivityEndpoint,
     IssueCommentViewSet,
