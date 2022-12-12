@@ -41,7 +41,6 @@ from .cycle import CycleViewSet, CycleIssueViewSet, BulkAssignIssuesToCycleEndpo
 from .asset import FileAssetEndpoint
 from .issue import (
     IssueViewSet,
-    UserIssuesEndpoint,
     WorkSpaceIssuesEndpoint,
     IssueActivityEndpoint,
     IssueCommentViewSet,
@@ -49,6 +48,7 @@ from .issue import (
     IssuePropertyViewSet,
     LabelViewSet,
     BulkDeleteIssuesEndpoint,
+    UserWorkSpaceIssues,
 )
 
 from .auth_extended import (
