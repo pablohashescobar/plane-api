@@ -37,7 +37,6 @@ from plane.api.views import (
     CycleViewSet,
     FileAssetEndpoint,
     IssueViewSet,
-    UserIssuesEndpoint,
     WorkSpaceIssuesEndpoint,
     IssueActivityEndpoint,
     IssueCommentViewSet,
@@ -55,6 +54,7 @@ from plane.api.views import (
     BulkDeleteIssuesEndpoint,
     BulkAssignIssuesToCycleEndpoint,
     ProjectUserViewsEndpoint,
+    UserWorkSpaceIssues,
 )
 
 from plane.api.views.project import AddTeamToProjectEndpoint
@@ -142,12 +142,6 @@ urlpatterns = [
         "users/me/invitations/projects/",
         UserProjectInvitationsViewset.as_view({"get": "list", "post": "create"}),
         name="user-project-invitaions",
-    ),
-    # user issues
-    path(
-        "users/me/issues/",
-        UserIssuesEndpoint.as_view(),
-        name="user-issues",
     ),
     ## Workspaces ##
     path(
@@ -494,6 +488,11 @@ urlpatterns = [
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/bulk-delete-issues/",
         BulkDeleteIssuesEndpoint.as_view(),
+    ),
+    path(
+        "workspaces/<str:slug>/me/issues/",
+        UserWorkSpaceIssues.as_view(),
+        name="workspace-issues",
     ),
     ## End Issues
     ## Issue Activity
