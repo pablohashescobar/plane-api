@@ -165,7 +165,6 @@ class IssueViewSet(BaseViewSet):
 class UserWorkSpaceIssues(BaseAPIView):
     def get(self, request, slug):
         try:
-            print(request.user)
             issues = Issue.objects.filter(
                 assignees__in=[request.user], workspace__slug=slug
             )
