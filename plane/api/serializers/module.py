@@ -5,7 +5,7 @@ from rest_framework import serializers
 from .base import BaseSerializer
 from .user import UserLiteSerializer
 from .project import ProjectSerializer
-from .issue import IssueSerializer
+from .issue import IssueFlatSerializer
 
 from plane.db.models import User, Module, ModuleMember, ModuleIssue
 
@@ -83,12 +83,7 @@ class ModuleWriteSerializer(BaseSerializer):
         return super().update(instance, validated_data)
 
 
-class ModuleSerializer(BaseSerializer):
-
-    project_detail = ProjectSerializer(read_only=True, source="project")
-    lead_detail = UserLiteSerializer(read_only=True, source="lead")
-    members_detail = UserLiteSerializer(read_only=True, many=True, source="members")
-
+class ModuleFlatSerializer(BaseSerializer):
     class Meta:
         model = Module
         fields = "__all__"
@@ -104,11 +99,32 @@ class ModuleSerializer(BaseSerializer):
 
 class ModuleIssueSerializer(BaseSerializer):
 
-    module_detail = ModuleSerializer(read_only=True, source="module")
-    issue_detail = IssueSerializer(read_only=True, source="issue")
+    module_detail = ModuleFlatSerializer(read_only=True, source="module")
+    issue_detail = IssueFlatSerializer(read_only=True, source="issue")
 
     class Meta:
         model = ModuleIssue
+        fields = "__all__"
+        read_only_fields = [
+            "workspace",
+            "project",
+            "created_by",
+            "updated_by",
+            "created_at",
+            "updated_at",
+            "module",
+        ]
+
+
+class ModuleSerializer(BaseSerializer):
+
+    project_detail = ProjectSerializer(read_only=True, source="project")
+    lead_detail = UserLiteSerializer(read_only=True, source="lead")
+    members_detail = UserLiteSerializer(read_only=True, many=True, source="members")
+    module_issues = ModuleIssueSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Module
         fields = "__all__"
         read_only_fields = [
             "workspace",

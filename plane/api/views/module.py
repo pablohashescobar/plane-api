@@ -1,9 +1,13 @@
+# Django Imports
+from django.db import IntegrityError
+from django.db.models import Prefetch
+
 # Third party imports
 from rest_framework.response import Response
 from rest_framework import status
 
 # Module imports
-from . import BaseViewSet, BaseAPIView
+from . import BaseViewSet
 from plane.api.serializers import (
     ModuleWriteSerializer,
     ModuleSerializer,
@@ -37,6 +41,12 @@ class ModuleViewSet(BaseViewSet):
             .select_related("workspace")
             .select_related("lead")
             .prefetch_related("members")
+            .prefetch_related(
+                Prefetch(
+                    "module_issues",
+                    queryset=ModuleIssue.objects.select_related("module", "issue"),
+                )
+            )
         )
 
     def create(self, request, slug, project_id):
@@ -55,6 +65,12 @@ class ModuleViewSet(BaseViewSet):
             return Response(
                 {"error": "Project was not found"}, status=status.HTTP_404_NOT_FOUND
             )
+        except IntegrityError as e:
+            if "already exists" in str(e):
+                return Response(
+                    {"name": "The module name is already taken"},
+                    status=status.HTTP_410_GONE,
+                )
 
 
 class ModuleIssueViewSet(BaseViewSet):

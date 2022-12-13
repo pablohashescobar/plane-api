@@ -597,7 +597,7 @@ urlpatterns = [
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/modules/<uuid:pk>/",
-        ModuleIssueViewSet.as_view(
+        ModuleViewSet.as_view(
             {
                 "get": "retrieve",
                 "put": "update",
@@ -609,7 +609,7 @@ urlpatterns = [
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/modules/<uuid:module_id>/module-issues/",
-        ModuleViewSet.as_view(
+        ModuleIssueViewSet.as_view(
             {
                 "get": "list",
                 "post": "create",
@@ -619,7 +619,7 @@ urlpatterns = [
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/modules/<uuid:module_id>/module-issues/<uuid:pk>/",
-        ModuleViewSet.as_view(
+        ModuleIssueViewSet.as_view(
             {
                 "get": "retrieve",
                 "put": "update",
