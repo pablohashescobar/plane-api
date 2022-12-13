@@ -161,10 +161,14 @@ class IssueViewSet(BaseViewSet):
             )
 
 
-class UserIssuesEndpoint(BaseAPIView):
-    def get(self, request):
+
+class UserWorkSpaceIssues(BaseAPIView):
+    def get(self, request, slug):
         try:
-            issues = Issue.objects.filter(assignees__in=[request.user])
+            print(request.user)
+            issues = Issue.objects.filter(
+                assignees__in=[request.user], workspace__slug=slug
+            )
             serializer = IssueSerializer(issues, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:

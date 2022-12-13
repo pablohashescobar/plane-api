@@ -22,7 +22,6 @@ from plane.api.serializers import (
     ProjectMemberSerializer,
     ProjectDetailSerializer,
     ProjectMemberInviteSerializer,
-    ProjectIdentifierSerializer,
 )
 
 from plane.api.permissions import ProjectBasePermission
@@ -144,9 +143,13 @@ class ProjectViewSet(BaseViewSet):
         except IntegrityError as e:
             if "already exists" in str(e):
                 return Response(
-                    {"name": "The project name is already taken"},
+                    {"name": "The project identifier is already taken"},
                     status=status.HTTP_410_GONE,
                 )
+        except Workspace.DoesNotExist as e:
+            return Response(
+                {"error": "Workspace does not exist"}, status=status.HTTP_404_NOT_FOUND
+            )
         except serializers.ValidationError as e:
             return Response(
                 {"identifier": "The project identifier is already taken"},
@@ -187,6 +190,10 @@ class ProjectViewSet(BaseViewSet):
             return Response(
                 {"identifier": "The project identifier is already taken"},
                 status=status.HTTP_410_GONE,
+            )
+        except (Project.DoesNotExist or Workspace.DoesNotExist) as e:
+            return Response(
+                {"error": "Project does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
             capture_exception(e)
@@ -498,9 +505,9 @@ class ProjectIdentifierEndpoint(BaseAPIView):
                     {"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
-            exists = ProjectIdentifier.objects.filter(name=name).values(
-                "id", "name", "project"
-            )
+            exists = ProjectIdentifier.objects.filter(
+                name=name, workspace__slug=slug
+            ).values("id", "name", "project")
 
             return Response(
                 {"exists": len(exists), "identifiers": exists},
@@ -523,13 +530,13 @@ class ProjectIdentifierEndpoint(BaseAPIView):
                     {"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
-            if Project.objects.filter(identifier=name).exists():
+            if Project.objects.filter(identifier=name, workspace__slug=slug).exists():
                 return Response(
                     {"error": "Cannot delete an identifier of an existing project"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            ProjectIdentifier.objects.filter(name=name).delete()
+            ProjectIdentifier.objects.filter(name=name, workspace__slug=slug).delete()
 
             return Response(
                 status=status.HTTP_204_NO_CONTENT,

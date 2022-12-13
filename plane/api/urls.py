@@ -37,7 +37,6 @@ from plane.api.views import (
     CycleViewSet,
     FileAssetEndpoint,
     IssueViewSet,
-    UserIssuesEndpoint,
     WorkSpaceIssuesEndpoint,
     IssueActivityEndpoint,
     IssueCommentViewSet,
@@ -57,6 +56,7 @@ from plane.api.views import (
     ProjectUserViewsEndpoint,
     ModuleViewSet,
     ModuleIssueViewSet,
+    UserLastProjectWithWorkspaceEndpoint,
 )
 
 from plane.api.views.project import AddTeamToProjectEndpoint
@@ -145,12 +145,6 @@ urlpatterns = [
         UserProjectInvitationsViewset.as_view({"get": "list", "post": "create"}),
         name="user-project-invitaions",
     ),
-    # user issues
-    path(
-        "users/me/issues/",
-        UserIssuesEndpoint.as_view(),
-        name="user-issues",
-    ),
     ## Workspaces ##
     path(
         "workspaces/",
@@ -233,6 +227,11 @@ urlpatterns = [
             }
         ),
         name="workspace",
+    ),
+    path(
+        "users/last-visited-workspace/",
+        UserLastProjectWithWorkspaceEndpoint.as_view(),
+        name="workspace-project-details",
     ),
     ## End Workspaces ##
     # Projects
