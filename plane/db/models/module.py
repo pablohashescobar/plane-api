@@ -66,3 +66,23 @@ class ModuleMember(ProjectBaseModel):
 
     def __str__(self):
         return f"{self.module.name} {self.member}"
+
+
+class ModuleIssue(ProjectBaseModel):
+
+    module = models.ForeignKey(
+        "db.Module", on_delete=models.CASCADE, related_name="issues"
+    )
+    issue = models.ForeignKey(
+        "db.Issue", on_delete=models.CASCADE, related_name="modules"
+    )
+
+    class Meta:
+        unique_together = ["module", "issue"]
+        verbose_name = "Module Issue"
+        verbose_name_plural = "Module Issues"
+        db_table = "module_issues"
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"{self.module.name} {self.issue.name}"
