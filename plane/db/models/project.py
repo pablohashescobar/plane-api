@@ -53,6 +53,7 @@ class Project(BaseModel):
         null=True,
         blank=True,
     )
+    icon = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         """Return name of the project"""
@@ -129,6 +130,7 @@ class ProjectMember(ProjectBaseModel):
     def __str__(self):
         """Return members of the project"""
         return f"{self.member.email} <{self.project.name}>"
+
 
 # TODO: Remove workspace relation later
 class ProjectIdentifier(AuditModel):
