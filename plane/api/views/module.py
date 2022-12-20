@@ -15,7 +15,7 @@ from plane.api.serializers import (
     ModuleIssueSerializer,
 )
 from plane.api.permissions import ProjectEntityPermission
-from plane.db.models import Module, ModuleIssue, Project
+from plane.db.models import Module, ModuleIssue, Project, Issue
 
 
 class ModuleViewSet(BaseViewSet):
@@ -125,6 +125,11 @@ class ModuleIssueViewSet(BaseViewSet):
             module = Module.objects.get(
                 workspace__slug=slug, project_id=project_id, pk=module_id
             )
+
+            issues = Issue.objects.filter(
+                pk__in=issues, workspace__slug=slug, project_id=project_id
+            )
+
             ModuleIssue.objects.bulk_create(
                 [
                     ModuleIssue(
