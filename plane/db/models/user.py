@@ -66,6 +66,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_login_uagent = models.TextField(blank=True)
     token_updated_at = models.DateTimeField(null=True)
     last_workspace_id = models.UUIDField(null=True)
+    my_issues_prop = models.JSONField(null=True)
+
 
     USERNAME_FIELD = "email"
 
