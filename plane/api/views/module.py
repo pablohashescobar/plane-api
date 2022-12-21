@@ -73,6 +73,7 @@ class ModuleViewSet(BaseViewSet):
                     status=status.HTTP_410_GONE,
                 )
         except Exception as e:
+
             capture_exception(e)
             return Response(
                 {"error": "Something went wrong please try again later"},
@@ -134,7 +135,7 @@ class ModuleIssueViewSet(BaseViewSet):
                 [
                     ModuleIssue(
                         module=module,
-                        issue_id=issue,
+                        issue=issue,
                         project_id=project_id,
                         workspace=module.workspace,
                         created_by=request.user,
