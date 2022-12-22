@@ -64,6 +64,7 @@ class ModuleWriteSerializer(BaseSerializer):
         module = Module.objects.create(**validated_data, project=instance.project)
 
         if members is not None:
+            ModuleIssue.objects.filter(module=instance).delete()
             ModuleMember.objects.bulk_create(
                 [
                     ModuleMember(
