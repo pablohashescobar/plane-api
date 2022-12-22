@@ -37,6 +37,7 @@ from plane.db.models import (
     Label,
     IssueBlocker,
     CycleIssue,
+    ModuleIssue
 )
 
 
@@ -94,6 +95,12 @@ class IssueViewSet(BaseViewSet):
                 Prefetch(
                     "issue_cycle",
                     queryset=CycleIssue.objects.select_related("cycle", "issue"),
+                ),
+            )
+            .prefetch_related(
+                Prefetch(
+                    "issue_module",
+                    queryset=ModuleIssue.objects.select_related("module", "issue"),
                 ),
             )
         )
