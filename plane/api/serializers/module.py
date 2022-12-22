@@ -121,7 +121,7 @@ class ModuleSerializer(BaseSerializer):
     project_detail = ProjectSerializer(read_only=True, source="project")
     lead_detail = UserLiteSerializer(read_only=True, source="lead")
     members_detail = UserLiteSerializer(read_only=True, many=True, source="members")
-    module_issues = ModuleIssueSerializer(read_only=True, many=True)
+    issue_module = ModuleIssueSerializer(read_only=True, many=True)
 
     class Meta:
         model = Module
