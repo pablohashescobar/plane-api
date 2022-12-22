@@ -52,6 +52,7 @@ class ModuleWriteSerializer(BaseSerializer):
                     for member in members
                 ],
                 batch_size=10,
+                ignore_conflicts=True
             )
 
         return module
@@ -76,6 +77,7 @@ class ModuleWriteSerializer(BaseSerializer):
                     for member in members
                 ],
                 batch_size=10,
+                ignore_conflicts=True
             )
 
         return super().update(instance, validated_data)
